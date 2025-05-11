@@ -1,0 +1,383 @@
+basePath: /api/v1
+definitions:
+  profileHandler.ErrorResponse:
+    properties:
+      error:
+        type: string
+    type: object
+  profileModel.Profile:
+    properties:
+      avatar:
+        type: string
+      bio:
+        type: string
+      city:
+        type: string
+      country:
+        type: string
+      createdAt:
+        type: string
+      facebook_url:
+        type: string
+      id:
+        type: string
+      instagram_url:
+        type: string
+      isActive:
+        type: boolean
+      phone_number:
+        type: string
+      state:
+        type: string
+      street:
+        type: string
+      twitter_url:
+        type: string
+      updatedAt:
+        type: string
+      user_id:
+        type: string
+      website:
+        type: string
+      whatsapp:
+        type: string
+      zip_code:
+        type: string
+    type: object
+  profileModel.UserProfileDTO:
+    properties:
+      avatar:
+        type: string
+      bio:
+        type: string
+      city:
+        type: string
+      country:
+        type: string
+      facebook_url:
+        type: string
+      instagram_url:
+        type: string
+      phone_number:
+        type: string
+      state:
+        type: string
+      street:
+        type: string
+      twitter_url:
+        type: string
+      user_id:
+        type: string
+      website:
+        type: string
+      whatsapp:
+        type: string
+      zip_code:
+        type: string
+    required:
+    - user_id
+    type: object
+  userHandler.ErrorResponse:
+    properties:
+      error:
+        type: string
+    type: object
+  userModel.CreateUserInput:
+    properties:
+      driver:
+        type: boolean
+      email:
+        type: string
+      first_name:
+        type: string
+      last_name:
+        type: string
+    required:
+    - email
+    - first_name
+    - last_name
+    type: object
+  userModel.User:
+    properties:
+      createdAt:
+        type: string
+      driver:
+        type: boolean
+      email:
+        type: string
+      first_name:
+        type: string
+      id:
+        type: string
+      isActive:
+        type: boolean
+      last_name:
+        type: string
+      profile:
+        $ref: '#/definitions/profileModel.Profile'
+      updatedAt:
+        type: string
+    type: object
+externalDocs:
+  description: OpenAPI
+  url: https://swagger.io/resources/open-api/
+host: localhost:3800
+info:
+  contact:
+    email: rodrigo.m.quintero@gmail.io
+    name: API Support
+    url: http://pilotodetormenta/support
+  description: This is a piloto de tormenta API.
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: Piloto de Tormenta API
+  version: "1.0"
+paths:
+  /profile:
+    post:
+      consumes:
+      - application/json
+      description: Create a user profile
+      parameters:
+      - description: Data to create a new user profile
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/profileModel.UserProfileDTO'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/profileModel.Profile'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/profileHandler.ErrorResponse'
+      summary: Create a new Profile
+      tags:
+      - profile
+  /profile/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Soft delete a user profile
+      parameters:
+      - description: Profile ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/profileModel.Profile'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/profileHandler.ErrorResponse'
+      summary: Soft delete profile
+      tags:
+      - profile
+    get:
+      consumes:
+      - application/json
+      description: Get a user profile by ID
+      parameters:
+      - description: Profile ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/profileModel.Profile'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/profileHandler.ErrorResponse'
+      summary: Get profile by ID
+      tags:
+      - profile
+    put:
+      consumes:
+      - application/json
+      description: Update a user profile
+      parameters:
+      - description: Profile ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Data to update a user profile
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/profileModel.UserProfileDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/profileModel.Profile'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/profileHandler.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/profileHandler.ErrorResponse'
+      summary: Update profile
+      tags:
+      - profile
+  /users:
+    get:
+      description: Get all users in the system
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/userModel.User'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/userHandler.ErrorResponse'
+      summary: Get all users
+      tags:
+      - users
+    post:
+      consumes:
+      - application/json
+      description: Create and register a new user on the system
+      parameters:
+      - description: Data to create a new user
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/userModel.CreateUserInput'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/userModel.User'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/userHandler.ErrorResponse'
+      summary: Create a new user
+      tags:
+      - users
+  /users/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Soft delete a user by their ID
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/userModel.User'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/userHandler.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/userHandler.ErrorResponse'
+      summary: Soft delete user
+      tags:
+      - users
+    get:
+      description: Get a user by their ID
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/userModel.User'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/userHandler.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/userHandler.ErrorResponse'
+      summary: Get user by ID
+      tags:
+      - users
+    put:
+      consumes:
+      - application/json
+      description: Update an existing user
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Data to update the user
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/userModel.CreateUserInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/userModel.User'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/userHandler.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/userHandler.ErrorResponse'
+      summary: Update user
+      tags:
+      - users
+securityDefinitions:
+  BasicAuth:
+    type: basic
+swagger: "2.0"
