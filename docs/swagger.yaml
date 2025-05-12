@@ -1,5 +1,34 @@
 basePath: /api/v1
 definitions:
+  authHandler.ErrorResponse:
+    properties:
+      error:
+        type: string
+    type: object
+  authModel.LoginDTO:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    required:
+    - email
+    type: object
+  authModel.RegisterDTO:
+    properties:
+      driver:
+        type: boolean
+      email:
+        type: string
+      first_name:
+        type: string
+      last_name:
+        type: string
+    required:
+    - email
+    - first_name
+    - last_name
+    type: object
   profileHandler.ErrorResponse:
     properties:
       error:
@@ -92,10 +121,18 @@ definitions:
         type: string
       last_name:
         type: string
+      password:
+        type: string
+      role:
+        items:
+          type: string
+        type: array
     required:
     - email
     - first_name
     - last_name
+    - password
+    - role
     type: object
   userModel.User:
     properties:
@@ -113,8 +150,14 @@ definitions:
         type: boolean
       last_name:
         type: string
+      password:
+        type: string
       profile:
         $ref: '#/definitions/profileModel.Profile'
+      role:
+        items:
+          type: string
+        type: array
       updatedAt:
         type: string
     type: object
@@ -135,6 +178,62 @@ info:
   title: Piloto de Tormenta API
   version: "1.0"
 paths:
+  /auth/login:
+    post:
+      consumes:
+      - application/json
+      description: Login a user and return a JWT token
+      parameters:
+      - description: Data to login a user
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/authModel.LoginDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/authHandler.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/authHandler.ErrorResponse'
+      summary: Login a user
+      tags:
+      - Auth
+  /auth/register:
+    post:
+      consumes:
+      - application/json
+      description: Register a new user on the system
+      parameters:
+      - description: Data to register a new user
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/authModel.RegisterDTO'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/authHandler.ErrorResponse'
+      summary: Register a new user
+      tags:
+      - Auth
   /profile:
     post:
       consumes:

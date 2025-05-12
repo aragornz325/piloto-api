@@ -3,9 +3,9 @@ package errors
 import (
 	"fmt"
 	"net/http"
+	"github.com/aragornz325/piloto-api/pkg/logger"
+	"go.uber.org/zap"
 )
-
-
 
 // Error implements the error interface for HttpError.
 // It returns the error message, optionally including the wrapped error if present.
@@ -22,22 +22,28 @@ func (e *HttpError) Unwrap() error {
 }
 
 func NewBadRequest(opts ErrorFuncOptions ) *HttpError {
-	fmt.Println(opts)
+	logger.Log.Error("Bad request", zap.String("message", opts.Message), zap.Error(opts.Err))
 	return &HttpError{Code: http.StatusBadRequest, Message: opts.Message, Err: opts.Err}
 }
 
 func NewNotFound(opts SimpleErrorFuncOptions) *HttpError {
-	fmt.Println(opts)
+	logger.Log.Error("Not found", zap.String("message", opts.Message))
 	return &HttpError{Code: http.StatusNotFound, Message: opts.Message}
 }
 
 func NewUnauthorized(opts SimpleErrorFuncOptions) *HttpError {
-	fmt.Println(opts)
+	logger.Log.Error("Unauthorized", zap.String("message", opts.Message))
 	return &HttpError{Code: http.StatusUnauthorized, Message: opts.Message}
 }
 
 func NewInternal(opts ErrorFuncOptions) *HttpError {
+	logger.Log.Error("Internal server error", zap.String("message", opts.Message), zap.Error(opts.Err))
 	return &HttpError{Code: http.StatusInternalServerError, Message: opts.Message, Err: opts.Err}
+}
+
+func NewForbidden(opts ErrorFuncOptions) *HttpError {
+	logger.Log.Error("Forbidden", zap.String("message", opts.Message), zap.Error(opts.Err))
+	return &HttpError{Code: http.StatusForbidden, Message: opts.Message, Err: opts.Err}
 }
 
 

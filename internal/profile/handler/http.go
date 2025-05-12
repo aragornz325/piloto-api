@@ -54,7 +54,10 @@ func (h *ProfileHandler) CreateProfileHandler(c *gin.Context) {
 		return
 	}
 	// Mapear campos no nulos al modelo
-	if err := utils.CopyNonNilFields(&payload, &profile); err != nil {
+	if err := utils.CopyNonNilFields(utils.CopyNonNilFieldsFuncParams{
+		Source: &payload,
+		Dest:   &profile,
+	}); err != nil {
 		c.JSON(http.StatusInternalServerError, ErrorResponse{Error: err.Error()})
 		return
 	}
@@ -134,7 +137,10 @@ func (h *ProfileHandler) UpdateProfileHandler(c *gin.Context) {
 	}
 
 	// Mapear campos no nulos al modelo
-	if err := utils.CopyNonNilFields(&payload, &profile); err != nil {
+	if err := utils.CopyNonNilFields(utils.CopyNonNilFieldsFuncParams{
+		Source: &payload,
+		Dest:   &profile,
+	}); err != nil {
 		c.JSON(http.StatusInternalServerError, ErrorResponse{Error: err.Error()})
 		return
 	}

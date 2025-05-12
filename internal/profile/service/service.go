@@ -38,7 +38,7 @@ func (s *profileService) CreateProfile(opts CreateProfileFuncParams) (*profileMo
 	if err := db.DB.WithContext(opts.Ctx).Create(opts.Profile).Error; err != nil {
 		return nil, err
 	}
-	opts.Profile.CreatedAt = time.Now()
+	opts.Profile.CreatedAt = time.Now().UTC()	
 	return opts.Profile, nil
 }
 
@@ -93,7 +93,7 @@ func (s *profileService) SoftDeleteUserProfile(opts SoftDeleteUserProfileFuncPar
 		return nil, err
 	}
 	profilePtr.IsActive = false
-	profilePtr.DeletedAt.Time = time.Now()
+	profilePtr.DeletedAt.Time = time.Now().UTC()
 	if _, err := s.UpdateUserProfile(UpdateUserProfileFuncParams{
 		Ctx:     opts.Ctx,
 		Profile: profilePtr,

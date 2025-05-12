@@ -48,11 +48,12 @@ func NewUserService() UserService {
 // The function uses a service operation wrapper to handle the database interaction
 // and error handling. It creates a new user record in the database.
 func (s *userService) CreateUser(opts CreateUserFuncParams) (*userModel.User, error) {
-	opts.User.CreatedAt = time.Now()
+	opts.User.CreatedAt = time.Now().UTC()
 	opts.User.IsActive = true
 	 err := utils.PerformServiceOperation(utils.PerformServiceOperationFunc{
 		Ctx:  opts.Ctx,
 		Name: "CreateUser",
+		ServiceName: "user",
 		Operation: func() error {
 			if err := db.DB.
 			WithContext(opts.Ctx).
@@ -118,10 +119,11 @@ func (s *userService) UpdateUser(opts UpdateUserFuncParams) (*userModel.User, er
 	if err != nil {
 		return nil, err
 	}
-	opts.User.UpdatedAt = time.Now()
+	opts.User.UpdatedAt = time.Now().UTC()
 	err = utils.PerformServiceOperation(utils.PerformServiceOperationFunc{
 		Ctx:  opts.Ctx,
 		Name: "UpdateUser",
+		ServiceName: "user",
 		Operation: func() error {
 			if err := db.DB.
 			WithContext(opts.Ctx).
@@ -154,6 +156,7 @@ func (s *userService) GetUserById(opts GetUserByIdFuncParams) (*userModel.User, 
 	err := utils.PerformServiceOperation(utils.PerformServiceOperationFunc{
 		Ctx:  opts.Ctx,
 		Name: "GetUserById",
+		ServiceName: "user",
 		Operation: func() error {
 			if err := db.DB.WithContext(opts.Ctx).
 				Preload("Profile").
@@ -181,7 +184,7 @@ func (s *userService) GetUserById(opts GetUserByIdFuncParams) (*userModel.User, 
 //   - *userModel.User: Pointer to the updated user model.
 //   - error: Error if the operation fails, otherwise nil.
 func (s *userService) SoftDeleteUser(opts GetUserByIdFuncParams) (*userModel.User, error) {
-	now := time.Now()
+	now := time.Now().UTC()
 	userPtr, err := s.GetUserById(GetUserByIdFuncParams{
 		Ctx:    opts.Ctx,
 		UserId: opts.UserId,
@@ -196,6 +199,7 @@ func (s *userService) SoftDeleteUser(opts GetUserByIdFuncParams) (*userModel.Use
 	err = utils.PerformServiceOperation(utils.PerformServiceOperationFunc{
 		Ctx:  opts.Ctx,
 		Name: "SoftDeleteUser",
+		ServiceName: "user",
 		Operation: func() error {
 			_, err := s.UpdateUser(UpdateUserFuncParams{
 				User:   userPtr,
@@ -228,6 +232,7 @@ func (s *userService) GetUserByEmail(opts GetUserByEmailFuncParams) (*userModel.
 	err := utils.PerformServiceOperation(utils.PerformServiceOperationFunc{
 		Ctx:  opts.Ctx,
 		Name: "GetUserByEmail",
+		ServiceName: "user",
 		Operation: func() error {
 			if err := db.DB.WithContext(opts.Ctx).Where("email = ?", opts.Email).First(&user).Error; err != nil {
 				return fmt.Errorf("error getting user by email: %w", err)

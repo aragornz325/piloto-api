@@ -8,10 +8,10 @@ import (
 	"go.uber.org/zap"
 )
 
-func PerformServiceOperation(opts PerformServiceOperationFunc) error {
+func PerformHandlerOperation(opts PerformHandlerOperationFunc) error {
 	start := time.Now().UTC()
 
-	logger.Log.Info("🧪 start "+opts.ServiceName+" service operation",
+	logger.Log.Info("🧪 start "+opts.HandlerName+" handler operation",
 		zap.String("op", opts.Name),
 	)
 
@@ -20,13 +20,13 @@ func PerformServiceOperation(opts PerformServiceOperationFunc) error {
 	duration := time.Since(start)
 
 	if err != nil {
-		logger.Log.Error("💥 An error occurred in "+opts.ServiceName+" service operation",
+		logger.Log.Error("💥 An error occurred in "+opts.Name+" handler operation",
 			zap.String("op", opts.Name),
 			zap.Error(err),
 			zap.Duration("duration", duration),
 		)
 	} else {
-		logger.Log.Info("✅ Operation "+opts.ServiceName+" service operation success",
+		logger.Log.Info("✅ Operation "+opts.Name+" Success",
 			zap.String("op", opts.Name),
 			zap.Duration("duration", duration),
 		)
@@ -36,9 +36,9 @@ func PerformServiceOperation(opts PerformServiceOperationFunc) error {
 }
 
 // /-------------structs------------------///
-type PerformServiceOperationFunc struct {
+type PerformHandlerOperationFunc struct {
 	Ctx         context.Context
 	Name        string
-	ServiceName string
+	HandlerName string
 	Operation   func() error
 }

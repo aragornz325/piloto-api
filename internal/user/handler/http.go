@@ -5,12 +5,12 @@ import (
 
 	m "github.com/aragornz325/piloto-api/internal/user/model"
 	userService "github.com/aragornz325/piloto-api/internal/user/service"
+	"github.com/aragornz325/piloto-api/pkg/errors"
 	"github.com/aragornz325/piloto-api/pkg/utils"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
 	"github.com/google/uuid"
 )
-
 
 type ErrorResponse struct {
 	Error string `json:"error"`
@@ -53,17 +53,32 @@ func (h *UserHandler) CreateUserHandler(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, ErrorResponse{Error: err.Error()})
 		return
 	}
+
+	if *payload.Email == "" || *payload.Password == "" {
+		c.JSON(http.StatusBadRequest, errors.
+			NewBadRequest(errors.ErrorFuncOptions{
+				Message: "Email and password are required",
+				Err:     nil,
+			}))
+		return
+	}
 	// Map non-null fields to the model
-	if err := utils.CopyNonNilFields(&payload, &user); err != nil {
+	if err := utils.
+		CopyNonNilFields(utils.CopyNonNilFieldsFuncParams{
+			Source: payload,
+			Dest:   &user,
+		}); err != nil {
 		c.JSON(http.StatusInternalServerError, ErrorResponse{Error: err.Error()})
 		return
 	}
-	
+
 	// create user
-	createdUser, err := h.UserService.CreateUser(userService.CreateUserFuncParams{
-		Ctx:   c.Request.Context(),
-		User: &user,
-	})
+	createdUser, err := h.UserService.
+		CreateUser(userService.
+			CreateUserFuncParams{
+			Ctx:  c.Request.Context(),
+			User: &user,
+		})
 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, ErrorResponse{Error: err.Error()})
@@ -133,13 +148,13 @@ func (h *UserHandler) GetUserByIdHandler(c *gin.Context) {
 func (h *UserHandler) UpdateUserHandler(c *gin.Context) {
 	idParan := c.Param("id")
 	userId, err := uuid.Parse(idParan)
-    if err != nil {
-        c.JSON(http.StatusBadRequest, ErrorResponse{Error: "Invalid user ID"})
-        return
-    }
+	if err != nil {
+		c.JSON(http.StatusBadRequest, ErrorResponse{Error: "Invalid user ID"})
+		return
+	}
 	var payload m.CreateUserInput
 	var user m.User
-	
+
 	// Bind JSON
 	if err := c.ShouldBindJSON(&payload); err != nil {
 		c.JSON(http.StatusBadRequest, ErrorResponse{Error: err.Error()})
@@ -152,7 +167,10 @@ func (h *UserHandler) UpdateUserHandler(c *gin.Context) {
 		return
 	}
 	// Mapear campos no nulos al modelo
-	if err := utils.CopyNonNilFields(&payload, &user); err != nil {
+	if err := utils.CopyNonNilFields(utils.CopyNonNilFieldsFuncParams{
+		Source: &payload,
+		Dest:   &user,
+	}); err != nil {
 		c.JSON(http.StatusInternalServerError, ErrorResponse{Error: err.Error()})
 		return
 	}
@@ -160,7 +178,7 @@ func (h *UserHandler) UpdateUserHandler(c *gin.Context) {
 	result, err := h.UserService.UpdateUser(userService.UpdateUserFuncParams{
 		Ctx:    c.Request.Context(),
 		UserId: userId,
-		User:  &user,
+		User:   &user,
 	})
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, ErrorResponse{Error: err.Error()})

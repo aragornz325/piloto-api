@@ -8,7 +8,9 @@ import (
 // CopyNonNilFields copia los campos no nulos desde un struct origen (usualmente un DTO con punteros)
 // hacia un destino (una entidad), campo por campo, usando reflection.
 // Si un campo es nil en el origen y es de tipo string en el destino, se asigna "no information" como default.
-func CopyNonNilFields(source interface{}, dest interface{}) error {
+func CopyNonNilFields(opts CopyNonNilFieldsFuncParams) error {
+	source := opts.Source
+	dest := opts.Dest
 	srcVal := reflect.ValueOf(source)
 	dstVal := reflect.ValueOf(dest)
 
@@ -44,4 +46,11 @@ func CopyNonNilFields(source interface{}, dest interface{}) error {
 	}
 
 	return nil
+}
+
+//------Struct -------//
+
+type CopyNonNilFieldsFuncParams struct {
+	Source interface{}
+	Dest   interface{}
 }
